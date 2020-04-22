@@ -16,7 +16,7 @@ class NotesApp extends StatelessWidget {
     initialData: CurrentUser.initial,
     child: Consumer<CurrentUser>(
       builder: (context, user, _) => MaterialApp(
-        title: 'Flutter Keep',
+        title: 'Dailo',
         theme: Theme.of(context).copyWith(
           brightness: Brightness.light,
           primaryColor: Colors.white,
