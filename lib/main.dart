@@ -1,3 +1,4 @@
+import 'package:flt_keep/resources/app_colors.dart';
 import 'package:flt_keep/screen/item_add_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
@@ -20,8 +21,9 @@ class NotesApp extends StatelessWidget {
           builder: (context, user, _) => MaterialApp(
             title: 'Dailo',
             theme: Theme.of(context).copyWith(
+              backgroundColor: Color(AppColors.background),
               brightness: Brightness.light,
-              primaryColor: Colors.white,
+              primaryColor: Color(AppColors.green),
               accentColor: kAccentColorLight,
               appBarTheme: AppBarTheme.of(context).copyWith(
                 elevation: 0,
