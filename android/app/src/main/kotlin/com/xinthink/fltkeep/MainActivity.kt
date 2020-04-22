@@ -1,4 +1,4 @@
-package com.xinthink.fltkeep
+package np.com.naxa.dailo
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
