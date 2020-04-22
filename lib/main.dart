@@ -1,3 +1,4 @@
+import 'package:flt_keep/screen/item_add_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' show FirebaseAuth;
 import 'package:provider/provider.dart';
@@ -12,41 +13,42 @@ class NotesApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) => StreamProvider.value(
-    value: FirebaseAuth.instance.onAuthStateChanged.map((user) => CurrentUser.create(user)),
-    initialData: CurrentUser.initial,
-    child: Consumer<CurrentUser>(
-      builder: (context, user, _) => MaterialApp(
-        title: 'Dailo',
-        theme: Theme.of(context).copyWith(
-          brightness: Brightness.light,
-          primaryColor: Colors.white,
-          accentColor: kAccentColorLight,
-          appBarTheme: AppBarTheme.of(context).copyWith(
-            elevation: 0,
-            brightness: Brightness.light,
-            iconTheme: IconThemeData(
-              color: kIconTintLight,
+        value: FirebaseAuth.instance.onAuthStateChanged
+            .map((user) => CurrentUser.create(user)),
+        initialData: CurrentUser.initial,
+        child: Consumer<CurrentUser>(
+          builder: (context, user, _) => MaterialApp(
+            title: 'Dailo',
+            theme: Theme.of(context).copyWith(
+              brightness: Brightness.light,
+              primaryColor: Colors.white,
+              accentColor: kAccentColorLight,
+              appBarTheme: AppBarTheme.of(context).copyWith(
+                elevation: 0,
+                brightness: Brightness.light,
+                iconTheme: IconThemeData(
+                  color: kIconTintLight,
+                ),
+              ),
+              scaffoldBackgroundColor: Colors.white,
+              bottomAppBarColor: kBottomAppBarColorLight,
+              primaryTextTheme: Theme.of(context).primaryTextTheme.copyWith(
+                    // title
+                    headline6: const TextStyle(
+                      color: kIconTintLight,
+                    ),
+                  ),
             ),
-          ),
-          scaffoldBackgroundColor: Colors.white,
-          bottomAppBarColor: kBottomAppBarColorLight,
-          primaryTextTheme: Theme.of(context).primaryTextTheme.copyWith(
-            // title
-            headline6: const TextStyle(
-              color: kIconTintLight,
-            ),
+            home: user.isInitialValue
+                ? Scaffold(body: const SizedBox())
+                : user.data != null ? ItemAddScreen() : LoginScreen(),
+            routes: {
+              '/settings': (_) => SettingsScreen(),
+            },
+            onGenerateRoute: _generateRoute,
           ),
         ),
-        home: user.isInitialValue
-          ? Scaffold(body: const SizedBox())
-          : user.data != null ? HomeScreen() : LoginScreen(),
-        routes: {
-          '/settings': (_) => SettingsScreen(),
-        },
-        onGenerateRoute: _generateRoute,
-      ),
-    ),
-  );
+      );
 
   /// Handle named route
   Route _generateRoute(RouteSettings settings) {
@@ -65,10 +67,11 @@ class NotesApp extends StatelessWidget {
     final path = uri.path ?? '';
     // final q = uri.queryParameters ?? <String, String>{};
     switch (path) {
-      case '/note': {
-        final note = (settings.arguments as Map ?? {})['note'];
-        return _buildRoute(settings, (_) => NoteEditor(note: note));
-      }
+      case '/note':
+        {
+          final note = (settings.arguments as Map ?? {})['note'];
+          return _buildRoute(settings, (_) => NoteEditor(note: note));
+        }
       default:
         return null;
     }
@@ -76,8 +79,8 @@ class NotesApp extends StatelessWidget {
 
   /// Create a [Route].
   Route _buildRoute(RouteSettings settings, WidgetBuilder builder) =>
-    MaterialPageRoute<void>(
-      settings: settings,
-      builder: builder,
-    );
+      MaterialPageRoute<void>(
+        settings: settings,
+        builder: builder,
+      );
 }

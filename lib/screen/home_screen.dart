@@ -128,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> with CommandHandler {
                 const SizedBox(width: 16),
                 const Expanded(
                   child: Text(
-                    'Dailo',
+                    '',
                     softWrap: false,
                     style: TextStyle(
                       color: kHintTextColorLight,
