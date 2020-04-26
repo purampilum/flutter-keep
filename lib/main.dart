@@ -36,14 +36,14 @@ class NotesApp extends StatelessWidget {
               bottomAppBarColor: kBottomAppBarColorLight,
               primaryTextTheme: Theme.of(context).primaryTextTheme.copyWith(
                     // title
-                    headline6: const TextStyle(
+                    headline: const TextStyle(
                       color: kIconTintLight,
                     ),
                   ),
             ),
             home: user.isInitialValue
                 ? Scaffold(body: const SizedBox())
-                : user.data != null ? ItemAddScreen() : LoginScreen(),
+                : user.data != null ? HomeScreen() : LoginScreen(),
             routes: {
               '/settings': (_) => SettingsScreen(),
             },

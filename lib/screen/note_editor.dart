@@ -1,11 +1,15 @@
 import 'dart:async';
 
+import 'package:flt_keep/resources/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flt_keep/icons.dart';
-import 'package:flt_keep/models.dart' show CurrentUser, Note, NoteState, NoteStateX;
+import 'package:flt_keep/models.dart'
+    show CurrentUser, Note, NoteState, NoteStateX;
 import 'package:flt_keep/services.dart';
 import 'package:flt_keep/styles.dart';
 import 'package:flt_keep/widgets.dart';
@@ -27,15 +31,18 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
   /// Create a state for [NoteEditor], with an optional [note] being edited,
   /// otherwise a new one will be created.
   _NoteEditorState(Note note)
-    : this._note = note ?? Note(),
-    _originNote = note?.copy() ?? Note(),
-    this._titleTextController = TextEditingController(text: note?.title),
-    this._contentTextController = TextEditingController(text: note?.content);
+      : this._note = note ?? Note(),
+        _originNote = note?.copy() ?? Note(),
+        this._titleTextController = TextEditingController(text: note?.title),
+        this._contentTextController =
+            TextEditingController(text: note?.content);
 
   /// The note in editing
   final Note _note;
+
   /// The origin copy before editing
   final Note _originNote;
+
   Color get _noteColor => _note.color ?? kDefaultNoteColor;
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -46,11 +53,15 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
   /// If the note is modified.
   bool get _isDirty => _note != _originNote;
 
+  final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+
   @override
   void initState() {
     super.initState();
-    _titleTextController.addListener(() => _note.title = _titleTextController.text);
-    _contentTextController.addListener(() => _note.content = _contentTextController.text);
+    _titleTextController
+        .addListener(() => _note.title = _titleTextController.text);
+    _contentTextController
+        .addListener(() => _note.content = _contentTextController.text);
   }
 
   @override
@@ -74,8 +85,8 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
             data: Theme.of(context).copyWith(
               primaryColor: _noteColor,
               appBarTheme: Theme.of(context).appBarTheme.copyWith(
-                elevation: 0,
-              ),
+                    elevation: 0,
+                  ),
               scaffoldBackgroundColor: _noteColor,
               bottomAppBarColor: _noteColor,
             ),
@@ -105,92 +116,203 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
   }
 
   Widget _buildBody(BuildContext context, String uid) => DefaultTextStyle(
-    style: kNoteTextLargeLight,
-    child: WillPopScope(
-      onWillPop: () => _onPop(uid),
-      child: Container(
-        height: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: SingleChildScrollView(
-          child: _buildNoteDetail(),
+        style: kNoteTextLargeLight,
+        child: WillPopScope(
+          onWillPop: () => _onPop(uid),
+          child: Container(
+            height: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: SingleChildScrollView(
+              child: _buildNoteDetail(),
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
   Widget _buildNoteDetail() => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: <Widget>[
-      TextField(
-        controller: _titleTextController,
-        style: kNoteTitleLight,
-        decoration: const InputDecoration(
-          hintText: 'Title',
-          border: InputBorder.none,
-          counter: const SizedBox(),
-        ),
-        maxLines: null,
-        maxLength: 1024,
-        textCapitalization: TextCapitalization.sentences,
-        readOnly: !_note.state.canEdit,
-      ),
-      const SizedBox(height: 14),
-      TextField(
-        controller: _contentTextController,
-        style: kNoteTextLargeLight,
-        decoration: const InputDecoration.collapsed(hintText: 'Note'),
-        maxLines: null,
-        textCapitalization: TextCapitalization.sentences,
-        readOnly: !_note.state.canEdit,
-      ),
-    ],
-  );
-
-  List<Widget> _buildTopActions(BuildContext context, String uid) => [
-    if (_note.state != NoteState.deleted) IconButton(
-        icon: Icon(_note.pinned == true ? AppIcons.pin : AppIcons.pin_outlined),
-        tooltip: _note.pinned == true ? 'Unpin' : 'Pin',
-        onPressed: () => _updateNoteState(uid, _note.pinned ? NoteState.unspecified : NoteState.pinned),
-    ),
-    if (_note.id != null && _note.state < NoteState.archived) IconButton(
-      icon: const Icon(AppIcons.archive_outlined),
-      tooltip: 'Archive',
-      onPressed: () => Navigator.pop(context, NoteStateUpdateCommand(
-        id: _note.id,
-        uid: uid,
-        from: _note.state,
-        to: NoteState.archived,
-      )),
-    ),
-    if (_note.state == NoteState.archived) IconButton(
-      icon: const Icon(AppIcons.unarchive_outlined),
-      tooltip: 'Unarchive',
-      onPressed: () => _updateNoteState(uid, NoteState.unspecified),
-    ),
-  ];
-
-  Widget _buildBottomAppBar(BuildContext context) => BottomAppBar(
-    child: Container(
-      height: kBottomBarSize,
-      padding: const EdgeInsets.symmetric(horizontal: 9),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          IconButton(
-              icon: const Icon(AppIcons.add_box),
-              color: kIconTintLight,
-              onPressed: _note.state.canEdit ? () {} : null,
+          TextField(
+            controller: _titleTextController,
+            style: kNoteTitleLight,
+            decoration: const InputDecoration(
+              hintText: 'Title',
+              border: InputBorder.none,
+              counter: const SizedBox(),
+            ),
+            maxLines: null,
+            maxLength: 1024,
+            textCapitalization: TextCapitalization.sentences,
+            readOnly: !_note.state.canEdit,
           ),
-          Text('Edited ${_note.strLastModified}'),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            color: kIconTintLight,
-            onPressed: () => _showNoteBottomSheet(context),
+          const SizedBox(height: 14),
+          TextField(
+            onTap: () {
+              formBottomSheetMenu();
+            },
+            controller: _contentTextController,
+            style: kNoteTextLargeLight,
+            decoration: const InputDecoration.collapsed(
+                hintText: 'Write your order here'),
+            maxLines: null,
+            textCapitalization: TextCapitalization.sentences,
+            readOnly: !_note.state.canEdit,
           ),
         ],
-      ),
-    ),
-  );
+      );
+
+  formBottomSheetMenu() {
+    showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext context) {
+          return SingleChildScrollView(
+              child: Container(
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: SingleChildScrollView(
+                      child: FormBuilder(
+                        key: _fbKey,
+                        autovalidate: false,
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Expanded(
+                                  child: FormBuilderTextField(
+                                    attribute: "item_name",
+                                    autofocus: true,
+                                    style: TextStyle(fontSize: 32),
+                                    decoration: InputDecoration(
+                                        focusedBorder: InputBorder.none,
+                                        enabledBorder: InputBorder.none),
+                                    validators: [
+                                      FormBuilderValidators.required(),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: FormBuilderTouchSpin(
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none),
+                                    iconActiveColor: Color(AppColors.blue),
+                                    attribute: "item_count",
+                                    initialValue: 1,
+                                    step: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: double.infinity,
+                              child: FlatButton(
+                                textColor: Color(AppColors.background),
+                                color: Color(AppColors.green),
+                                onPressed: () {},
+                                child: Text("Add to order".toUpperCase()),
+                              ),
+                            )
+                          ],
+                        ),
+//                        child: Row(
+//                          children: <Widget>[
+//                            Expanded(
+//                              flex: 6,
+//                              child: FormBuilderTextField(
+//                                autofocus: true,
+//                                attribute: "item_name",
+//                                decoration: InputDecoration(
+//                                    labelText: "Item name",
+//                                    enabledBorder: InputBorder.none),
+//                                validators: [FormBuilderValidators.required()],
+//                              ),
+//                            ),
+//                            SizedBox(
+//                              width: 16,
+//                            ),
+//                            Expanded(
+//                              flex: 2,
+//                              child: FormBuilderTextField(
+//                                attribute: "item_name",
+//                                decoration: InputDecoration(
+//                                    labelText: "Quantity",
+//                                    enabledBorder: InputBorder.none),
+//                                validators: [FormBuilderValidators.required()],
+//                              ),
+//                            ),
+//                            SizedBox(
+//                              width: 16,
+//                            ),
+//                            Expanded(
+//                              flex: 3,
+//                              child: OutlineButton.icon(
+//                                icon: Icon(Icons.add),
+//                                label: Text("Add"),
+//                                onPressed: () {},
+//                              ),
+//                            )
+//                          ],
+//                        ),
+                      ),
+                    ),
+                  )));
+        });
+  }
+
+  List<Widget> _buildTopActions(BuildContext context, String uid) => [
+        if (_note.state != NoteState.deleted)
+          IconButton(
+            icon: Icon(
+                _note.pinned == true ? AppIcons.pin : AppIcons.pin_outlined),
+            tooltip: _note.pinned == true ? 'Unpin' : 'Pin',
+            onPressed: () => _updateNoteState(
+                uid, _note.pinned ? NoteState.unspecified : NoteState.pinned),
+          ),
+        if (_note.id != null && _note.state < NoteState.archived)
+          IconButton(
+            icon: const Icon(AppIcons.archive_outlined),
+            tooltip: 'Archive',
+            onPressed: () => Navigator.pop(
+                context,
+                NoteStateUpdateCommand(
+                  id: _note.id,
+                  uid: uid,
+                  from: _note.state,
+                  to: NoteState.archived,
+                )),
+          ),
+        if (_note.state == NoteState.archived)
+          IconButton(
+            icon: const Icon(AppIcons.unarchive_outlined),
+            tooltip: 'Unarchive',
+            onPressed: () => _updateNoteState(uid, NoteState.unspecified),
+          ),
+      ];
+
+  Widget _buildBottomAppBar(BuildContext context) => BottomAppBar(
+        child: Container(
+          height: kBottomBarSize,
+          padding: const EdgeInsets.symmetric(horizontal: 9),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                icon: const Icon(AppIcons.add_box),
+                color: kIconTintLight,
+                onPressed: _note.state.canEdit ? () {} : null,
+              ),
+              Text('Edited ${_note.strLastModified}'),
+              IconButton(
+                icon: const Icon(Icons.more_vert),
+                color: kIconTintLight,
+                onPressed: () => _showNoteBottomSheet(context),
+              ),
+            ],
+          ),
+        ),
+      );
 
   void _showNoteBottomSheet(BuildContext context) async {
     final command = await showModalBottomSheet<NoteCommand>(
@@ -237,9 +359,10 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
 
   void _watchNoteDocument(String uid) {
     if (_noteSubscription == null && uid != null && _note.id != null) {
-      _noteSubscription = noteDocument(_note.id, uid).snapshots()
-        .map((snapshot) => snapshot.exists ? snapshot.toNote() : null)
-        .listen(_onCloudNoteUpdated);
+      _noteSubscription = noteDocument(_note.id, uid)
+          .snapshots()
+          .map((snapshot) => snapshot.exists ? snapshot.toNote() : null)
+          .listen(_onCloudNoteUpdated);
     }
   }
 
@@ -279,11 +402,13 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
     }
 
     // otherwise, handles it in a undoable manner
-    processNoteCommand(_scaffoldKey.currentState, NoteStateUpdateCommand(
-      id: _note.id,
-      uid: uid,
-      from: _note.state,
-      to: state,
-    ));
+    processNoteCommand(
+        _scaffoldKey.currentState,
+        NoteStateUpdateCommand(
+          id: _note.id,
+          uid: uid,
+          from: _note.state,
+          to: state,
+        ));
   }
 }

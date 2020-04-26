@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 32),
                       Text(
                         "म एक",
-                        style: Theme.of(context).textTheme.headline5,
+                        style: Theme.of(context).textTheme.headline,
                       ),
                       FormBuilder(
                         key: _fbKey,

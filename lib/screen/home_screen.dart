@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> with CommandHandler {
   @override
   Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark.copyWith(
-//      statusBarColor: Colors.white,
+          statusBarColor: Colors.white,
           systemNavigationBarColor: Colors.white,
           systemNavigationBarIconBrightness: Brightness.dark,
         ),
@@ -120,6 +120,9 @@ class _HomeScreenState extends State<HomeScreen> with CommandHandler {
             padding: EdgeInsets.symmetric(vertical: isNotAndroid ? 7 : 5),
             child: Row(
               children: <Widget>[
+                const SizedBox(
+                  height: 40,
+                ),
                 const SizedBox(width: 20),
                 InkWell(
                   child: const Icon(Icons.menu),
@@ -128,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> with CommandHandler {
                 const SizedBox(width: 16),
                 const Expanded(
                   child: Text(
-                    '',
+                    'Search',
                     softWrap: false,
                     style: TextStyle(
                       color: kHintTextColorLight,
@@ -137,16 +140,16 @@ class _HomeScreenState extends State<HomeScreen> with CommandHandler {
                   ),
                 ),
                 const SizedBox(width: 16),
-                InkWell(
-                  child:
-                      Icon(_gridView ? AppIcons.view_list : AppIcons.view_grid),
-                  onTap: () => setState(() {
-                    _gridView = !_gridView;
-                  }),
-                ),
-                const SizedBox(width: 18),
-                _buildAvatar(context),
-                const SizedBox(width: 10),
+//                InkWell(
+//                  child:
+//                      Icon(_gridView ? AppIcons.view_list : AppIcons.view_grid),
+//                  onTap: () => setState(() {
+//                    _gridView = !_gridView;
+//                  }),
+//                ),
+//                const SizedBox(width: 18),
+//                _buildAvatar(context),
+//                const SizedBox(width: 10),
               ],
             ),
           ),
@@ -159,14 +162,16 @@ class _HomeScreenState extends State<HomeScreen> with CommandHandler {
           height: kBottomBarSize,
           padding: const EdgeInsets.symmetric(horizontal: 17),
           child: Row(
-            children: <Widget>[],
+            children: <Widget>[
+
+            ],
           ),
         ),
       );
 
   Widget _fab(BuildContext context) => FloatingActionButton(
         backgroundColor: Theme.of(context).accentColor,
-        child: const Icon(Icons.call_made),
+        child: const Icon(Icons.add),
         onPressed: () async {
           final command = await Navigator.pushNamed(context, '/note');
           debugPrint('--- noteEditor result: $command');
