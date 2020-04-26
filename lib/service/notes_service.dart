@@ -99,6 +99,8 @@ mixin CommandHandler<T extends StatefulWidget> on State<T> {
   }
 }
 
+
+
 /// Add note related methods to [QuerySnapshot].
 extension NoteQuery on QuerySnapshot {
   /// Transforms the query result into a list of notes.

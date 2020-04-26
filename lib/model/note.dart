@@ -131,8 +131,8 @@ extension NoteStateX on NoteState {
   bool get canCreate => this <= NoteState.pinned;
 
   /// Checks if a note in this state can edit (modify / copy).
-//  bool get canEdit => this < NoteState.deleted;
-  bool get canEdit => false;
+  bool get canEdit => this < NoteState.deleted;
+//  bool get canEdit => false;
 
   bool operator <(NoteState other) => (this?.index ?? 0) < (other?.index ?? 0);
 

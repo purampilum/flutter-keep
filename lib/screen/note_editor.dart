@@ -54,6 +54,7 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
   bool get _isDirty => _note != _originNote;
 
   final GlobalKey<FormBuilderState> _fbKey = GlobalKey<FormBuilderState>();
+  final List<Map<String, dynamic>> orderItems = [];
 
   @override
   void initState() {
@@ -146,20 +147,51 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
             readOnly: !_note.state.canEdit,
           ),
           const SizedBox(height: 14),
-          TextField(
-            onTap: () {
-              formBottomSheetMenu();
-            },
-            controller: _contentTextController,
-            style: kNoteTextLargeLight,
-            decoration: const InputDecoration.collapsed(
-                hintText: 'Write your order here'),
-            maxLines: null,
-            textCapitalization: TextCapitalization.sentences,
-            readOnly: !_note.state.canEdit,
-          ),
+          orderItems.length == 0
+              ? TextField(
+                  onTap: () {
+                    formBottomSheetMenu();
+                  },
+                  controller: _contentTextController,
+                  style: kNoteTextLargeLight,
+                  decoration: const InputDecoration.collapsed(
+                      hintText: 'Write your order here'),
+                  maxLines: null,
+                  textCapitalization: TextCapitalization.sentences,
+                  readOnly: !_note.state.canEdit,
+                )
+              : orderTable(orderItems)
         ],
       );
+
+  orderTable(List<Map<String, dynamic>> orders) {
+    return DataTable(
+      columns: [
+        DataColumn(label: Text('Item')),
+        DataColumn(label: Text('Number')),
+        DataColumn(label: Text('')),
+      ],
+      rows: orders.map((item) {
+        return DataRow(cells: [
+          DataCell(Text(item['item_name']), onTap: () {}),
+          DataCell(Text(item['item_count'].toString()), onTap: () {}),
+          DataCell(FlatButton(
+            textColor: Color(AppColors.background),
+            color: Color(AppColors.green),
+            onPressed: () {
+              _removeOrderItem(item);
+            },
+            child: Text("Remove"),
+          ))
+        ]);
+      }).toList(),
+    );
+  }
+
+  _removeOrderItem(item) {
+    this.orderItems.remove(item);
+    setState(() {});
+  }
 
   formBottomSheetMenu() {
     showModalBottomSheet(
@@ -210,51 +242,19 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
                               child: FlatButton(
                                 textColor: Color(AppColors.background),
                                 color: Color(AppColors.green),
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (_fbKey.currentState.saveAndValidate()) {
+                                    setState(() {
+                                      orderItems.add(_fbKey.currentState.value);
+                                    });
+//                                    processNoteCommand(_scaffoldKey.currentState, NoteCommand(id: "order", uid: "order"));
+                                  }
+                                },
                                 child: Text("Add to order".toUpperCase()),
                               ),
                             )
                           ],
                         ),
-//                        child: Row(
-//                          children: <Widget>[
-//                            Expanded(
-//                              flex: 6,
-//                              child: FormBuilderTextField(
-//                                autofocus: true,
-//                                attribute: "item_name",
-//                                decoration: InputDecoration(
-//                                    labelText: "Item name",
-//                                    enabledBorder: InputBorder.none),
-//                                validators: [FormBuilderValidators.required()],
-//                              ),
-//                            ),
-//                            SizedBox(
-//                              width: 16,
-//                            ),
-//                            Expanded(
-//                              flex: 2,
-//                              child: FormBuilderTextField(
-//                                attribute: "item_name",
-//                                decoration: InputDecoration(
-//                                    labelText: "Quantity",
-//                                    enabledBorder: InputBorder.none),
-//                                validators: [FormBuilderValidators.required()],
-//                              ),
-//                            ),
-//                            SizedBox(
-//                              width: 16,
-//                            ),
-//                            Expanded(
-//                              flex: 3,
-//                              child: OutlineButton.icon(
-//                                icon: Icon(Icons.add),
-//                                label: Text("Add"),
-//                                onPressed: () {},
-//                              ),
-//                            )
-//                          ],
-//                        ),
                       ),
                     ),
                   )));
@@ -301,9 +301,13 @@ class _NoteEditorState extends State<NoteEditor> with CommandHandler {
               IconButton(
                 icon: const Icon(AppIcons.add_box),
                 color: kIconTintLight,
-                onPressed: _note.state.canEdit ? () {} : null,
+                onPressed: _note.state.canEdit
+                    ? () {
+                        formBottomSheetMenu();
+                      }
+                    : null,
               ),
-              Text('Edited ${_note.strLastModified}'),
+              Text('Last activity ${_note.strLastModified}'),
               IconButton(
                 icon: const Icon(Icons.more_vert),
                 color: kIconTintLight,
